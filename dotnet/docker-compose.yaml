@@ -1,0 +1,16 @@
+services:
+  dotnet_de:
+    build: .
+    image: nhanvuong/dotnet-de:alpine
+    container_name: dotnet-de
+    restart: always
+    entrypoint:
+      - sleep
+      - infinity
+    network_mode: bridge
+    volumes:
+      - dotnet_de:/root
+
+volumes:
+  dotnet_de:
+    name: dotnet_de

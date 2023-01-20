@@ -1,0 +1,16 @@
+services:
+  jdk8_de:
+    build: .
+    image: nhanvuong/jdk8-de:alpine
+    container_name: jdk8-de
+    restart: always
+    entrypoint:
+      - sleep
+      - infinity
+    network_mode: bridge
+    volumes:
+      - jdk8_de:/root
+
+volumes:
+  jdk8_de:
+    name: jdk8_de
