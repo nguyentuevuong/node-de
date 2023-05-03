@@ -1,0 +1,16 @@
+services:
+  node_de:
+    build: .
+    image: nhanvuong/node-de:alpine
+    container_name: node-16
+    restart: always
+    entrypoint:
+      - sleep
+      - infinity
+    network_mode: bridge
+    volumes:
+      - node_de:/root
+
+volumes:
+  node_de:
+    name: node_de
