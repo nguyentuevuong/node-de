@@ -1,0 +1,77 @@
+version: '2.1'
+
+services:
+  redis:  
+    image: redis:alpine
+    container_name: redis
+
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    container_name: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=d0timthayday
+      - MONGO_INITDB_DATABASE=nhatot
+    volumes:
+      - ./mongodb:/data/db
+
+  mongo-express:
+    image: mongo-express:latest
+    restart: unless-stopped
+    container_name: mongo-express
+    ports:
+      - 8081:8081
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://root:d0timthayday@mongo:27017/
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_MONGODB_AUTH_USERNAME=root
+      - ME_CONFIG_MONGODB_AUTH_PASSWORD=d0timthayday
+      - ME_CONFIG_BASICAUTH_USERNAME=root
+      - ME_CONFIG_BASICAUTH_PASSWORD=d0timthayday
+
+  crawler:
+    build: .
+    image: nhanvuong/puppeteer:latest
+    container_name: crawler
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined #optional
+    links:
+      - warp_proxy
+    depends_on:
+      - warp_proxy
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh
+      - PROXY_URL=warp_proxy
+      - CRAWL_URL=https://www.nhatot.com/mua-ban-dat?f=p&page=
+    volumes:
+      - .:/real-estate-crawler
+    ports:
+      - 3000:3000
+    shm_size: '2gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+  warp_proxy:
+    image: caomingjun/warp:latest
+    container_name: warp_proxy
+    restart: unless-stopped
+    environment:
+      - WARP_SLEEP=5
+      - WARP_LICENSE_KEY=8H1k70dA-78N6uF1E-6oQ83g9M
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+
+networks:
+  default:
+    name: crawler-with-proxy
