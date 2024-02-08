@@ -1,9 +1,23 @@
 version: '2.1'
 
 services:
+  warp_proxy:
+    image: caomingjun/warp:latest
+    container_name: warp_proxy
+    restart: unless-stopped
+    environment:
+      - WARP_SLEEP=5
+      - WARP_LICENSE_KEY=8H1k70dA-78N6uF1E-6oQ83g9M
+    cap_add:
+      - NET_ADMIN
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+
   redis:  
     image: redis:alpine
     container_name: redis
+    restart: unless-stopped
 
   mongo:
     image: mongo:latest
@@ -20,6 +34,12 @@ services:
     image: mongo-express:latest
     restart: unless-stopped
     container_name: mongo-express
+    links:
+      - redis
+      - warp_proxy
+    depends_on:
+      - redis
+      - warp_proxy
     ports:
       - 8081:8081
     environment:
@@ -39,8 +59,10 @@ services:
     security_opt:
       - seccomp:unconfined #optional
     links:
+      - redis
       - warp_proxy
     depends_on:
+      - redis
       - warp_proxy
     environment:
       - PUID=1000
@@ -58,19 +80,6 @@ services:
         reservations:
           devices:
             - capabilities: [gpu]
-
-  warp_proxy:
-    image: caomingjun/warp:latest
-    container_name: warp_proxy
-    restart: unless-stopped
-    environment:
-      - WARP_SLEEP=5
-      - WARP_LICENSE_KEY=8H1k70dA-78N6uF1E-6oQ83g9M
-    cap_add:
-      - NET_ADMIN
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=0
-      - net.ipv4.conf.all.src_valid_mark=1
 
 networks:
   default:
