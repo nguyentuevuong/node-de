@@ -51,10 +51,10 @@ services:
       - ME_CONFIG_BASICAUTH_USERNAME=root
       - ME_CONFIG_BASICAUTH_PASSWORD=d0timthayday
 
-  crawler:
+  crawler_index:
     build: .
     image: nhanvuong/puppeteer:latest
-    container_name: crawler
+    container_name: crawler_index
     restart: unless-stopped
     security_opt:
       - seccomp:unconfined #optional
@@ -64,14 +64,14 @@ services:
     depends_on:
       - redis
       - warp_proxy
+    volumes:
+      - crawler:/real-estate-crawler
     environment:
       - PUID=1000
       - PGID=1000
       - TZ=Asia/Ho_Chi_Minh
       - PROXY_URL=warp_proxy
       - CRAWL_URL=https://www.nhatot.com/mua-ban-dat?f=p&page=
-    volumes:
-      - .:/real-estate-crawler
     ports:
       - 3000:3000
     shm_size: '2gb'
@@ -80,6 +80,40 @@ services:
         reservations:
           devices:
             - capabilities: [gpu]
+
+  crawler_details:
+    build: .
+    image: nhanvuong/puppeteer:latest
+    container_name: crawler_details
+    restart: unless-stopped
+    security_opt:
+      - seccomp:unconfined #optional
+    links:
+      - redis
+      - warp_proxy
+    depends_on:
+      - redis
+      - warp_proxy
+    volumes:
+      - crawler:/real-estate-crawler
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Ho_Chi_Minh
+      - PROXY_URL=warp_proxy
+      - CRAWL_URL=https://www.nhatot.com/mua-ban-dat?f=p&page=
+    ports:
+      - 3001:3000
+    shm_size: '2gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+
+volumes:
+  crawler:
+    name: crawler
 
 networks:
   default:
