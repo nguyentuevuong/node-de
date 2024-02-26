@@ -46,10 +46,8 @@ services:
     container_name: mongo-express
     links:
       - redis
-      - warp_proxy
     depends_on:
       - redis
-      - warp_proxy
     ports:
       - 8081:8081
     environment:
@@ -70,9 +68,11 @@ services:
       - seccomp:unconfined #optional
     links:
       - redis
+      - rabbitmq
       - warp_proxy
     depends_on:
       - redis
+      - rabbitmq
       - warp_proxy
     volumes:
       - crawler:/real-estate-crawler
