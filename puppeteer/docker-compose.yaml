@@ -1,18 +1,18 @@
 version: '2.1'
 
 services:
-  warp_proxy:
-    image: caomingjun/warp:latest
-    container_name: warp_proxy
-    restart: unless-stopped
-    environment:
-      - WARP_SLEEP=5
-      - WARP_LICENSE_KEY=8H1k70dA-78N6uF1E-6oQ83g9M
-    cap_add:
-      - NET_ADMIN
-    sysctls:
-      - net.ipv6.conf.all.disable_ipv6=0
-      - net.ipv4.conf.all.src_valid_mark=1
+  # warp_proxy:
+  #   image: caomingjun/warp:latest
+  #   container_name: warp_proxy
+  #   restart: unless-stopped
+  #   environment:
+  #     - WARP_SLEEP=5
+  #     - WARP_LICENSE_KEY=8H1k70dA-78N6uF1E-6oQ83g9M
+  #   cap_add:
+  #     - NET_ADMIN
+  #   sysctls:
+  #     - net.ipv6.conf.all.disable_ipv6=0
+  #     - net.ipv4.conf.all.src_valid_mark=1
 
   redis:  
     image: redis:alpine
@@ -69,11 +69,11 @@ services:
     links:
       - redis
       - rabbitmq
-      - warp_proxy
+      # - warp_proxy
     depends_on:
       - redis
       - rabbitmq
-      - warp_proxy
+      # - warp_proxy
     volumes:
       - crawler:/real-estate-crawler
     environment:
@@ -85,11 +85,12 @@ services:
     ports:
       - 3000:3000
     shm_size: '2gb'
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: [gpu]
+    # entrypoint: yarn run:nhatot:index
 
   crawler_details:
     build: .
@@ -100,10 +101,10 @@ services:
       - seccomp:unconfined #optional
     links:
       - redis
-      - warp_proxy
+      # - warp_proxy
     depends_on:
       - redis
-      - warp_proxy
+      # - warp_proxy
     volumes:
       - crawler:/real-estate-crawler
     environment:
@@ -115,11 +116,12 @@ services:
     ports:
       - 3001:3000
     shm_size: '2gb'
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: [gpu]
+    # entrypoint: yarn run:nhatot:details
 
 volumes:
   crawler:
