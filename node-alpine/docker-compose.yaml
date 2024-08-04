@@ -8,8 +8,8 @@ services:
       - infinity
     network_mode: bridge
     volumes:
-      - node_de:/root
+      - node_latest:/root
 
 volumes:
-  node_de:
-    name: node_de
+  node_latest:
+    name: node_latest
