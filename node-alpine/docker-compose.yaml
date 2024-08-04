@@ -1,0 +1,15 @@
+services:
+  node_de:
+    image: node:alpine
+    container_name: node_de
+    restart: always
+    entrypoint:
+      - sleep
+      - infinity
+    network_mode: bridge
+    volumes:
+      - node_de:/root
+
+volumes:
+  node_de:
+    name: node_de
